@@ -1,0 +1,11 @@
+{
+  "name": "flusher-contract",
+  "version": "1.0.0",
+  "description": "Smart Account Flusher Contract",
+  "main": "truffle-config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
