@@ -5,7 +5,7 @@ import {IERC20, Wallet} from "./wallet.sol";
 contract Deployer {
 
    /**
-     * @dev Sell Stable ERC20_Token.
+     * @dev Deploy Create2 + Minimal Proxy
      * @param _salt salt.
      * @param _logic minimal proxy address.
     */
@@ -15,6 +15,7 @@ contract Deployer {
     ) public returns (address proxy) {
         bytes32 salt = _getSalt(_salt, msg.sender);
         bytes20 targetBytes = bytes20(_logic);
+        // solium-disable-next-line security/no-inline-assembly
         assembly {
             let clone := mload(0x40)
             mstore(
@@ -31,14 +32,13 @@ contract Deployer {
   }
 
   /**
-     * @dev Sell Stable ERC20_Token.
+     * @dev Compute Create2 + Minimal Proxy address
      * @param _salt salt.
      * @param _sender sender address.
-     * @param _data 363d3d373d3d3d363d73bebebebebebebebebebebebebebebebebebebebe5af43d82803e903d91602b57fd5bf3.
-     * bebebebebebebebebebebebebebebebebebebebe => _logic
+     * @param _logic minimal proxy address.
     */
-  function getDeploymentAddress(uint256 _salt, address _sender, bytes memory _data) public view returns (address) {
-    bytes32 codeHash = keccak256(_data);
+  function getDeploymentAddress(uint256 _salt, address _sender, address _logic) public view returns (address) {
+    bytes32 codeHash = keccak256(getMinimalProxyCreationCode(target));
     bytes32 salt = _getSalt(_salt, _sender);
     bytes32 rawAddress = keccak256(
       abi.encodePacked(
@@ -52,5 +52,12 @@ contract Deployer {
 
   function _getSalt(uint256 _salt, address _sender) internal pure returns (bytes32) {
     return keccak256(abi.encodePacked(_salt, _sender));
+  }
+
+  function getMinimalProxyCreationCode(address target) internal pure returns (bytes memory) {
+    bytes20 a = bytes20(0x3D602d80600A3D3981F3363d3d373d3D3D363d73);
+    bytes20 b = bytes20(target);
+    bytes15 c = bytes15(0x5af43d82803e903d91602b57fd5bf3);
+    return abi.encodePacked(a, b, c);
   }
 }
