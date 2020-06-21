@@ -38,7 +38,7 @@ contract Deployer {
      * @param _logic minimal proxy address.
     */
   function getDeploymentAddress(uint256 _salt, address _sender, address _logic) public view returns (address) {
-    bytes32 codeHash = keccak256(getMinimalProxyCreationCode(target));
+    bytes32 codeHash = keccak256(getMinimalProxyCreationCode(_logic));
     bytes32 salt = _getSalt(_salt, _sender);
     bytes32 rawAddress = keccak256(
       abi.encodePacked(
@@ -50,11 +50,11 @@ contract Deployer {
       return address(bytes20(rawAddress << 96));
   }
 
-  function _getSalt(uint256 _salt, address _sender) internal pure returns (bytes32) {
+  function _getSalt(uint256 _salt, address _sender) public pure returns (bytes32) {
     return keccak256(abi.encodePacked(_salt, _sender));
   }
-
-  function getMinimalProxyCreationCode(address target) internal pure returns (bytes memory) {
+  
+  function getMinimalProxyCreationCode(address target) public pure returns (bytes memory) {
     bytes20 a = bytes20(0x3D602d80600A3D3981F3363d3d373d3D3D363d73);
     bytes20 b = bytes20(target);
     bytes15 c = bytes15(0x5af43d82803e903d91602b57fd5bf3);
